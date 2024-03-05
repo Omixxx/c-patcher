@@ -26,30 +26,38 @@ def customMethodInfoDecoder(obj):
     return namedtuple("X", obj.keys())(*obj.values())
 
 
-def patch(path: str, path_to_patch: str):
-    print("cia")
-
-
-def validate_args(path: str, path_to_patch: str):
+def validate_args(path: str, path_to_patches: str):
     if (
         not os.path.exists(path)
-        or not os.path.exists(path_to_patch)
+        or not os.path.exists(path_to_patches)
         or not os.path.isdir(path)
-        or not os.path.isfile(path_to_patch)
+        or not os.path.isdir(path_to_patches)
     ):
         raise FileNotFoundError(
-            f"Invalid arguments, {path} must exist and be a directory, {path_to_patch} must exist and be a file"
+            f"Invalid arguments, {path} must exist and be a directory, {path_to_patches} must exist and be a directory."
         )
-    if path_to_patch.split(".")[-1] != "json":
-        raise ValueError(f"Invalid arguments, {path_to_patch} must be a json file")
+
+
+def get_patch_objects(path_to_patches: str) -> list[MethodInfo]:
+    patch_objects: list[MethodInfo] = []
+    for root, directories, files in os.walk(path_to_patches):
+        for file in files:
+            if not file.endswith(".json"):
+                continue
+            f = open(os.path.join(root, file), "r")
+            patch_objects.append(json.load(f, object_hook=customMethodInfoDecoder))
+            f.close()
+    return patch_objects
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         raise ValueError("Invalid number of arguments")
     path = sys.argv[1]
-    path_to_patch = sys.argv[2]
+    path_to_patches = sys.argv[2]
 
-    validate_args(path, path_to_patch)
-    f = open(path_to_patch, "r")
-    method_info: MethodInfo = json.load(f, object_hook=customMethodInfoDecoder)
+    validate_args(path, path_to_patches)
+    patch_objects: list[MethodInfo] = get_patch_objects(path_to_patches)
+
+    for patch in patch_objects:
+        print(patch.readabilityScore)
