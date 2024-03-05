@@ -1,14 +1,33 @@
 import json
 import os
 import sys
+from collections import namedtuple
+
+
+class MethodInfo:
+    def __init__(
+        self,
+        name: str,
+        method: str,
+        startLine: int,
+        endLine: int,
+        classPath: str,
+        readabilityScore: float,
+    ):
+        self.name = name
+        self.method = method
+        self.startLine = startLine
+        self.endLine = endLine
+        self.classPath = classPath
+        self.readabilityScore = readabilityScore
+
+
+def customMethodInfoDecoder(obj):
+    return namedtuple("X", obj.keys())(*obj.values())
 
 
 def patch(path: str, path_to_patch: str):
-    validate_args(path, path_to_patch)
-    f = open(path_to_patch, "r")
-    data = json.load(f)
-    for key in data:
-        print(key)
+    print("cia")
 
 
 def validate_args(path: str, path_to_patch: str):
@@ -28,4 +47,9 @@ def validate_args(path: str, path_to_patch: str):
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         raise ValueError("Invalid number of arguments")
-    patch(sys.argv[1], sys.argv[2])
+    path = sys.argv[1]
+    path_to_patch = sys.argv[2]
+
+    validate_args(path, path_to_patch)
+    f = open(path_to_patch, "r")
+    method_info: MethodInfo = json.load(f, object_hook=customMethodInfoDecoder)
