@@ -1,8 +1,0 @@
-{
-  "name": "compareTo",
-  "method": "   public int compareTo(MethodInfo m){\n       return this.getReadabilityScore().compareTo(m.getReadabilityScore());\n   }",
-  "startLine": 66,
-  "endLine": 69,
-  "classPath": "clarity/src/main/java/it/unimol/miner/MethodInfo.java",
-  "readabilityScore": 0.6962897777557373
-}
