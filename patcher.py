@@ -83,6 +83,21 @@ def apply_patches(patch_objects: list[MethodInfo]):
             file.writelines(afther)
 
 
+def remove_tokens(patch_object: MethodInfo):
+    tokens = {
+        "$indentation$": "\t",
+        "$whitespace$": " ",
+        "$newline$": "\n",
+    }
+
+    for token in tokens:
+        patch_object.model_prediction = patch_object.model_prediction.replace(
+            token, tokens[token]
+        )
+    print(patch_object.model_prediction)
+    # dobbiamo considerare che molti metodi hanno un $indentation$ ad inizio riga, quindi nel caso va rimosso
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         raise ValueError("Invalid number of arguments")
@@ -93,5 +108,5 @@ if __name__ == "__main__":
     patch_objects: list[MethodInfo] = get_patch_objects(path_to_patches)
     os.chdir(path)
     for patch in patch_objects:
-        print(patch.classPath)
+        remove_tokens(patch)
     # apply_patches(patch_objects)
