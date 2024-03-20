@@ -1,4 +1,4 @@
-import json
+import csv
 import os
 import sys
 from collections import namedtuple
@@ -8,18 +8,26 @@ class MethodInfo:
     def __init__(
         self,
         name: str,
-        method: str,
         startLine: int,
         endLine: int,
         classPath: str,
         readabilityScore: float,
+        label: str,
+        originalMethod: str,
+        abstractMethod: str,
+        model_prediction: str,
+        manual_flag: str,
     ):
         self.name = name
-        self.method = method
         self.startLine = startLine
         self.endLine = endLine
         self.classPath = classPath
         self.readabilityScore = readabilityScore
+        self.label = label
+        self.originalMethod = originalMethod
+        self.abstractMethod = abstractMethod
+        self.model_prediction = model_prediction
+        self.manual_flag = manual_flag
 
 
 def customMethodInfoDecoder(obj):
@@ -38,16 +46,27 @@ def validate_args(path: str, path_to_patches: str):
         )
 
 
-def get_patch_objects(path_to_patches: str) -> list[MethodInfo]:
-    patch_objects: list[MethodInfo] = []
-    for root, directories, files in os.walk(path_to_patches):
-        for file in files:
-            if not file.endswith(".json"):
-                continue
-            f = open(os.path.join(root, file), "r")
-            patch_objects.append(json.load(f, object_hook=customMethodInfoDecoder))
-            f.close()
-    return patch_objects
+def get_patch_objects(path_to_result_csv: str) -> list[MethodInfo]:
+    list_of_patch_objects: list[MethodInfo] = []
+    with open(path_to_result_csv, "r") as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter="\t")
+        for row in csv_reader:
+            list_of_patch_objects.append(
+                MethodInfo(
+                    row["name"],
+                    int(row["startLine"]),
+                    int(row["endLine"]),
+                    row["classPath"],
+                    float(row["readabilityScore"]),
+                    row["label"],
+                    row["original_method"],
+                    row["abstract_method"],
+                    row["model_prediction"],
+                    row["manual_flag"],
+                )
+            )
+
+    return list_of_patch_objects
 
 
 def apply_patches(patch_objects: list[MethodInfo]):
@@ -60,7 +79,7 @@ def apply_patches(patch_objects: list[MethodInfo]):
         with open(patch.classPath, "w") as file:
             file.write("")
             file.writelines(before)
-            file.writelines(patch.method)
+            file.writelines(patch.originalMethod)
             file.writelines(afther)
 
 
@@ -70,7 +89,9 @@ if __name__ == "__main__":
     path = sys.argv[1]
     path_to_patches = sys.argv[2]
 
-    validate_args(path, path_to_patches)
+    # validate_args(path, path_to_patches)
     patch_objects: list[MethodInfo] = get_patch_objects(path_to_patches)
     os.chdir(path)
-    apply_patches(patch_objects)
+    for patch in patch_objects:
+        print(patch.classPath)
+    # apply_patches(patch_objects)
