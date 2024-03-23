@@ -1,5 +1,5 @@
 import csv
-from types.TsvFileInput import TsvFileInput
+from modules.custom_types.TsvFileInput import TsvFileInput
 
 
 def extract_rows(path_to_result_tsv: str) -> list[TsvFileInput]:
@@ -21,22 +21,9 @@ def extract_rows(path_to_result_tsv: str) -> list[TsvFileInput]:
                     row["is_diff"],
                     row["partially_detokenized_method"],
                     row["detokenized_method"],
+                    row["predictions_readability_score"],
+                    row["does_test_suite_pass"],
                 )
             )
 
     return list_of_patch_objects
-
-
-def remove_tokens(patch_object: TsvFileInput) -> TsvFileInput:
-    tokens = {
-        "$indentation$": "\t",
-        "$whitespace$": " ",
-        "$newline$": "\n",
-    }
-
-    for token in tokens:
-        patch_object.model_prediction = patch_object.model_prediction.replace(
-            token, tokens[token]
-        )
-    return patch_object
-    # dobbiamo considerare che molti metodi hanno un $indentation$ ad inizio riga, quindi nel caso va rimosso

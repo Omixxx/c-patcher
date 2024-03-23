@@ -1,8 +1,7 @@
 import os
 import sys
-from modules.types.TsvFileInput import TsvFileInput
 import modules.utils as utils
-import modules.diff_evaluator as diff
+from modules.custom_types.TsvFileInput import TsvFileInput
 
 
 def validate_args(path: str, path_to_patches: str):
@@ -23,8 +22,6 @@ if __name__ == "__main__":
         raise ValueError("Invalid number of arguments")
     tsv_file_path = sys.argv[1]
     original_project = sys.argv[2]
-
-    diff.compute_diffs(tsv_file_path, "abstract_method", "model_prediction", "is_diff")
 
     # validate_args(path, path_to_patches)
 
