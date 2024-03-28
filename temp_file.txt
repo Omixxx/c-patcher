@@ -1,8 +1,0 @@
-#		@SuppressWarnings("unchecked")
-#		 RemovalListener<K1, V1> getRemovalListener(){
-#		    return (RemovalListener<K1, V1>) MoreObjects.firstNonNull(removalListener, NullListener.INSTANCE);
-#		}
-	 @ suppresswarnings ( $string$ ) 
- 	 removallistener < k1,   v1 >   getremovallistener ( ) { 
- 	 return   ( removallistener < k1,   v1 > )   moreobjects. firstnonnull ( removallistener,   nulllistener. instance ) ; 
- 	 }

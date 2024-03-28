@@ -5,8 +5,8 @@ import subprocess
 import modules.utils as utils
 from modules.custom_types.TsvFileInput import TsvFileInput
 
-TEMP_FILE = "temp_file.txt"
-ESCAPE_CHAR = "#"
+TEMP_FILE = "temp_file.java"
+ESCAPE_CHAR = "//"
 
 
 def create_file(file_path: str, content: str = ""):
@@ -31,24 +31,24 @@ def prepare_to_manual_evaluation(row: TsvFileInput):
         file.write(f"{row.partially_detokenized_method}")
 
 
-def get_detokenized_method(file_path: str):
+def get_detokenized_method(file_path: str) -> str:
     with open(file_path, "r") as file:
         lines = file.readlines()
     output = ""
     for line in lines:
         if not line.startswith(ESCAPE_CHAR):
             output += line
-    create_file("out.txt", output)
+    return output
 
 
-def evaluate(rows: list[TsvFileInput]):
+def evaluate(tsv_path: str, rows: list[TsvFileInput]):
     create_file(TEMP_FILE)
-    i = 0
+    
     for row in rows:
-        if ++i > 3:
+        if row.is_diff == "False":
             continue
-        i += 1
-        if not row.is_diff:
+
+        if row.detokenized_method != "" or row.does_contain_errors == "True":
             continue
 
         prepare_to_manual_evaluation(row)
@@ -57,11 +57,19 @@ def evaluate(rows: list[TsvFileInput]):
         after_hash = calculate_hash(TEMP_FILE)
 
         if before_hash == after_hash:
+            row.does_contain_errors = bool.__str__(True)
             continue
-        get_detokenized_method(TEMP_FILE)
+        
+        row.does_contain_errors = bool.__str__(False) 
+        row.detokenized_method = get_detokenized_method(TEMP_FILE)
+        
+        if row.detokenized_method == "":
+            break
+
+    utils.update_tsv(tsv_path, rows)
 
 
 if __name__ == "__main__":
     tsv_path = sys.argv[1]
     rows: list[TsvFileInput] = utils.extract_rows(tsv_path)
-    evaluate(rows)
+    evaluate(tsv_path, rows)

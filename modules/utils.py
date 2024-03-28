@@ -23,7 +23,16 @@ def extract_rows(path_to_result_tsv: str) -> list[TsvFileInput]:
                     row["detokenized_method"],
                     row["predictions_readability_score"],
                     row["does_test_suite_pass"],
+                    row["does_contain_errors"],
                 )
             )
 
     return list_of_patch_objects
+
+def update_tsv(tsv_path: str, rows:list[TsvFileInput]):
+    with open(tsv_path, "w", newline="", encoding="utf-8") as f:
+        fieldnames = TsvFileInput.attributes_as_list_of_strings()
+        writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter="\t")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(vars(row))
