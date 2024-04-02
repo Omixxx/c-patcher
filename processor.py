@@ -4,6 +4,7 @@ import sys
 import subprocess
 import modules.utils as utils
 from modules.custom_types.TsvFileInput import TsvFileInput
+import wordninja
 
 TEMP_FILE = "temp_file.java"
 ESCAPE_CHAR = "//"
@@ -28,7 +29,10 @@ def prepare_to_manual_evaluation(row: TsvFileInput):
     with open(TEMP_FILE, "w") as file:
         for line in row.originalMethod.split("\n"):
             file.write(f"{ESCAPE_CHAR}{line}\n")
-        file.write(f"{row.partially_detokenized_method}")
+
+        for word in row.partially_detokenized_method.split(" "):
+            if word != "":
+                file.write(f"{to_camel_case(word)} ")
 
 
 def get_detokenized_method(file_path: str) -> str:
@@ -43,7 +47,7 @@ def get_detokenized_method(file_path: str) -> str:
 
 def evaluate(tsv_path: str, rows: list[TsvFileInput]):
     create_file(TEMP_FILE)
-    
+
     for row in rows:
         if row.is_diff == "False":
             continue
@@ -59,14 +63,26 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
         if before_hash == after_hash:
             row.does_contain_errors = bool.__str__(True)
             continue
-        
-        row.does_contain_errors = bool.__str__(False) 
+
+        row.does_contain_errors = bool.__str__(False)
         row.detokenized_method = get_detokenized_method(TEMP_FILE)
-        
+
         if row.detokenized_method == "":
             break
 
     utils.update_tsv(tsv_path, rows)
+
+
+def to_camel_case(word):
+    assert word != ""
+    words = wordninja.split(word)
+    if (len(words) <= 1):
+        return word
+    
+    camel_case_word = "".join(
+        words[0] + "".join(word.capitalize() for word in words[1:])
+    )
+    return camel_case_word
 
 
 if __name__ == "__main__":
