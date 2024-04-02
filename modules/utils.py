@@ -46,10 +46,10 @@ def to_camel_case(word: str):
 
     begin_trailing_chars, end_trailing_chars, word = __remove_trailing_char(word)
     words = wordninja.split(word)
-    camel_case_word = "".join(
+    camel_case_word = (
         begin_trailing_chars
-        + words[0]
-        + "".join(word.capitalize() for word in words[1:])
+        + (words[0].lower() if len(words) > 0 else "")
+        + "".join([w.capitalize() for w in words[1:]])
         + end_trailing_chars
     )
 
@@ -58,18 +58,8 @@ def to_camel_case(word: str):
 
 def __remove_trailing_char(word: str):
     trailing_characters = set(".,;:()[]{}<>!@#$%^&*-_+=|\\/?><")
-    alphabet = set("abcdefghijklmnopqrstuvwxyz")
     begin_trailing_chars = ""
     end_trailing_chars = ""
-
-    is_only_trailing_chars = True
-    for char in word:
-        if char.lower() in alphabet:
-            is_only_trailing_chars = False
-            break
-
-    if is_only_trailing_chars:
-        return begin_trailing_chars, end_trailing_chars, word
 
     while word and word[-1] in trailing_characters:
         end_trailing_chars += word[-1]
@@ -79,5 +69,4 @@ def __remove_trailing_char(word: str):
         begin_trailing_chars += word[0]
         word = word[1:]
 
-    print(begin_trailing_chars, end_trailing_chars, word)
     return begin_trailing_chars, end_trailing_chars[::-1], word
