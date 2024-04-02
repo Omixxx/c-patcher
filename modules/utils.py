@@ -30,7 +30,8 @@ def extract_rows(path_to_result_tsv: str) -> list[TsvFileInput]:
 
     return list_of_patch_objects
 
-def update_tsv(tsv_path: str, rows:list[TsvFileInput]):
+
+def update_tsv(tsv_path: str, rows: list[TsvFileInput]):
     with open(tsv_path, "w", newline="", encoding="utf-8") as f:
         fieldnames = TsvFileInput.attributes_as_list_of_strings()
         writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter="\t")
@@ -39,17 +40,12 @@ def update_tsv(tsv_path: str, rows:list[TsvFileInput]):
             writer.writerow(vars(row))
 
 
-
-
-
-def to_camel_case(word):
-    assert word != ""
+def to_camel_case(word: str):
+    if len(word.strip()) == 0:
+        return ""
 
     begin_trailing_chars, end_trailing_chars, word = __remove_trailing_char(word)
     words = wordninja.split(word)
-    if len(words) <= 1:
-        return word
-    print(begin_trailing_chars, end_trailing_chars)
     camel_case_word = "".join(
         begin_trailing_chars
         + words[0]
@@ -58,6 +54,7 @@ def to_camel_case(word):
     )
 
     return camel_case_word
+
 
 def __remove_trailing_char(word: str):
     trailing_characters = set(".,;:()[]{}<>!@#$%^&*-_+=|\\/?><")
@@ -72,7 +69,7 @@ def __remove_trailing_char(word: str):
             break
 
     if is_only_trailing_chars:
-        return begin_trailing_chars, end_trailing_chars, ""
+        return begin_trailing_chars, end_trailing_chars, word
 
     while word and word[-1] in trailing_characters:
         end_trailing_chars += word[-1]
@@ -82,5 +79,5 @@ def __remove_trailing_char(word: str):
         begin_trailing_chars += word[0]
         word = word[1:]
 
+    print(begin_trailing_chars, end_trailing_chars, word)
     return begin_trailing_chars, end_trailing_chars[::-1], word
-
