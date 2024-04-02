@@ -4,7 +4,6 @@ import sys
 import subprocess
 import modules.utils as utils
 from modules.custom_types.TsvFileInput import TsvFileInput
-import wordninja
 
 TEMP_FILE = "temp_file.java"
 ESCAPE_CHAR = "//"
@@ -32,7 +31,7 @@ def prepare_to_manual_evaluation(row: TsvFileInput):
 
         for word in row.partially_detokenized_method.split(" "):
             if word != "":
-                file.write(f"{to_camel_case(word)} ")
+                file.write(f"{utils.to_camel_case(word)} ")
 
 
 def get_detokenized_method(file_path: str) -> str:
@@ -72,17 +71,6 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
 
     utils.update_tsv(tsv_path, rows)
 
-
-def to_camel_case(word):
-    assert word != ""
-    words = wordninja.split(word)
-    if (len(words) <= 1):
-        return word
-    
-    camel_case_word = "".join(
-        words[0] + "".join(word.capitalize() for word in words[1:])
-    )
-    return camel_case_word
 
 
 if __name__ == "__main__":
