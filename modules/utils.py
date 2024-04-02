@@ -1,6 +1,9 @@
 import csv
 import wordninja
 from modules.custom_types.TsvFileInput import TsvFileInput
+from binarytree import Node
+
+TRAILING_CHARACTERS = set('\t".,;:()[]{}<>!@#$%^&*-_+=|\\/?><\n')
 
 
 def extract_rows(path_to_result_tsv: str) -> list[TsvFileInput]:
@@ -40,33 +43,56 @@ def update_tsv(tsv_path: str, rows: list[TsvFileInput]):
             writer.writerow(vars(row))
 
 
-def to_camel_case(word: str):
+def __to_camel_case(word: str):
     if len(word.strip()) == 0:
         return ""
 
-    begin_trailing_chars, end_trailing_chars, word = __remove_trailing_char(word)
+    if word[0] in TRAILING_CHARACTERS:
+        return word
+
     words = wordninja.split(word)
-    camel_case_word = (
-        begin_trailing_chars
-        + (words[0].lower() if len(words) > 0 else "")
-        + "".join([w.capitalize() for w in words[1:]])
-        + end_trailing_chars
+    camel_case_word = (words[0] if len(words) > 0 else "") + "".join(
+        [w.capitalize() for w in words[1:]]
     )
 
     return camel_case_word
 
 
-def __remove_trailing_char(word: str):
-    trailing_characters = set(".,;:()[]{}<>!@#$%^&*-_+=|\\/?><")
-    begin_trailing_chars = ""
-    end_trailing_chars = ""
+def generate_trailing_parse_tree(word: str):
+    root = Node(word)
+    word_list = list(word)
+    for char in word_list:
+        if char in TRAILING_CHARACTERS:
+            index = word_list.index(char)
+            root.value = char
+            root.left = Node("".join(word_list[:index]))
+            root.right = generate_trailing_parse_tree("".join(word_list[index + 1 :]))
+            break
 
-    while word and word[-1] in trailing_characters:
-        end_trailing_chars += word[-1]
-        word = word[:-1]
+    return root
 
-    while word and word[0] in trailing_characters:
-        begin_trailing_chars += word[0]
-        word = word[1:]
 
-    return begin_trailing_chars, end_trailing_chars[::-1], word
+def resolve(root: Node | None) -> str:
+    if root is None:
+        return ""
+
+    left = __to_camel_case(root.left.value) if root.left else ""
+    middle = (
+        __to_camel_case(root.value)
+        if root.value not in TRAILING_CHARACTERS
+        else root.value
+    )
+    right = resolve(root.right)
+    return "".join(left + middle + right)
+
+
+def to_camel_case(word: str) -> str:
+    word = word.replace("    ", "\t")
+    result: str = ""
+    separator = ""
+    for w in word.split(" "):
+        root = generate_trailing_parse_tree(w)
+        root.pprint()
+        result = result + separator + resolve(root)
+        separator = " "
+    return result

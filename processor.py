@@ -29,9 +29,9 @@ def prepare_to_manual_evaluation(row: TsvFileInput):
         for line in row.originalMethod.split("\n"):
             file.write(f"{ESCAPE_CHAR}{line}\n")
 
-        for word in row.partially_detokenized_method.split(" "):
-            if word != "":
-                file.write(f"{utils.to_camel_case(word)} ")
+        file.write(f"{utils.to_camel_case(row.partially_detokenized_method)}")
+        file.write("\n")
+        file.write(row.partially_detokenized_method)
 
 
 def get_detokenized_method(file_path: str) -> str:
@@ -70,7 +70,6 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
             break
 
     utils.update_tsv(tsv_path, rows)
-
 
 
 if __name__ == "__main__":
