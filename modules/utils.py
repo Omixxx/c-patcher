@@ -58,7 +58,7 @@ def __to_camel_case(word: str):
     return camel_case_word
 
 
-def generate_trailing_parse_tree(word: str):
+def parse(word: str):
     root = Node(word)
     word_list = list(word)
     for char in word_list:
@@ -66,7 +66,7 @@ def generate_trailing_parse_tree(word: str):
             index = word_list.index(char)
             root.value = char
             root.left = Node("".join(word_list[:index]))
-            root.right = generate_trailing_parse_tree("".join(word_list[index + 1 :]))
+            root.right = parse("".join(word_list[index + 1 :]))
             break
 
     return root
@@ -91,7 +91,7 @@ def to_camel_case(word: str) -> str:
     result: str = ""
     separator = ""
     for w in word.split(" "):
-        root = generate_trailing_parse_tree(w)
+        root = parse(w)
         result = result + separator + resolve(root)
         separator = " "
     return result
