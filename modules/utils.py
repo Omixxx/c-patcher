@@ -92,7 +92,6 @@ def to_camel_case(word: str) -> str:
     separator = ""
     for w in word.split(" "):
         root = generate_trailing_parse_tree(w)
-        root.pprint()
         result = result + separator + resolve(root)
         separator = " "
     return result
