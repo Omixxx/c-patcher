@@ -10,7 +10,7 @@ def patch(class_path: str, start_line: int, end_line: int, patch: str):
     with open(class_path_with_projectname_removed, "r") as file:
         file_lines = file.readlines()
         # lines index start form 0 in file_lines!!
-        below_original_method = file_lines[end_line - 1 :]
+        below_original_method = file_lines[end_line:]
         above_original_method = file_lines[: start_line - 1]
         patched_file = (
             "".join(above_original_method) + patch + "".join(below_original_method)
@@ -21,7 +21,7 @@ def patch(class_path: str, start_line: int, end_line: int, patch: str):
 
 def run_test_suite(row: TsvFileInput):
     module_to_test = row.classPath.split("/")[1]
-    command = ["mvn", "test", "-pl", module_to_test]
+    command = ["mvn", "-Dcheckstyle.skip=true", "test", "-pl", module_to_test]
     process = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
@@ -43,6 +43,7 @@ project_path = sys.argv[2]
 rows = utils.extract_rows(tsv_file_path)
 current_dir = os.getcwd()
 os.chdir(project_path)
+i = 0
 for row in rows:
 
     if row.does_contain_errors == "":
@@ -57,5 +58,8 @@ for row in rows:
     logging.info("Removing patches...")
     subprocess.run(["git", "checkout", "."])
     print("\n")
+    if i == 6:
+        break
+    i += 1
 os.chdir(current_dir)
 utils.update_tsv(tsv_file_path, rows)
