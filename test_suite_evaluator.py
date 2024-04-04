@@ -6,7 +6,6 @@ import logging
 
 def patch(class_path: str, start_line: int, end_line: int, patch: str):
     class_path_with_projectname_removed = "/".join(class_path.split("/")[1:])
-    print(class_path_with_projectname_removed)
     with open(class_path_with_projectname_removed, "r") as file:
         file_lines = file.readlines()
         # lines index start form 0 in file_lines!!
@@ -20,11 +19,14 @@ def patch(class_path: str, start_line: int, end_line: int, patch: str):
 
 
 def run_test_suite(row: TsvFileInput):
-    module_to_test = row.classPath.split("/")[1]
-    command = ["mvn", "-Dcheckstyle.skip=true", "test", "-pl", module_to_test]
+    # module_to_test = row.classPath.split("/")[1]
+    command = ["mvn", "-Dcheckstyle.skip=true", "test", ]
     process = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
+
+    for line in process.stdout:
+        logging.info(line.decode("utf-8").strip())
 
     status_code = process.wait()
 
@@ -43,7 +45,6 @@ project_path = sys.argv[2]
 rows = utils.extract_rows(tsv_file_path)
 current_dir = os.getcwd()
 os.chdir(project_path)
-i = 0
 for row in rows:
 
     if row.does_contain_errors == "":
@@ -54,12 +55,11 @@ for row in rows:
 
     logging.info(f"Applying patches...")
     patch(row.classPath, row.startLine, row.endLine, row.detokenized_method)
+    logging.info(f"Testing {row.classPath}")
     run_test_suite(row)
     logging.info("Removing patches...")
     subprocess.run(["git", "checkout", "."])
     print("\n")
-    if i == 6:
-        break
-    i += 1
+    
 os.chdir(current_dir)
 utils.update_tsv(tsv_file_path, rows)
