@@ -8,11 +8,7 @@ def patch(class_path: str, start_line: int, end_line: int, patch: str) -> str:
         # lines index start form 0 in file_lines!!
         below_original_method = file_lines[end_line - 1 :]
         above_original_method = file_lines[: start_line - 1]
-
-        patched_method = (
-            above_original_method + patch.split("\n") + below_original_method
-        )
-        return "\n".join(patched_method)
+        return "".join(above_original_method) + patch + "".join(below_original_method)
 
 
 tsv_file_path = sys.argv[1]
