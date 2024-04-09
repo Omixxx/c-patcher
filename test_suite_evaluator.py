@@ -1,5 +1,5 @@
 import sys, os, subprocess
-from modules.custom_types.TsvFileInput import TsvFileInput 
+from modules.custom_types.TsvFileInput import TsvFileInput
 import modules.utils as utils
 import logging
 
@@ -20,7 +20,11 @@ def patch(class_path: str, start_line: int, end_line: int, patch: str):
 
 def run_test_suite(row: TsvFileInput):
     # module_to_test = row.classPath.split("/")[1]
-    command = ["mvn", "-Dcheckstyle.skip=true", "test", "-pl", "guava-tests"]
+    command = [
+        "mvn",
+        "-Dcheckstyle.skip=true",
+        "test",
+    ]
     process = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
@@ -45,19 +49,12 @@ project_path = sys.argv[2]
 rows = utils.extract_rows(tsv_file_path)
 current_dir = os.getcwd()
 os.chdir(project_path)
-i = 0
 for row in rows:
-
-    print(i)
-
-    if i == 100:
-        break
 
     if row.does_contain_errors == "":
         break
 
     if row.does_contain_errors == True.__str__():
-        i = i + 1
         continue
 
     logging.info(f"Applying patches...")
@@ -67,8 +64,6 @@ for row in rows:
     logging.info("Removing patches...")
     subprocess.run(["git", "checkout", "."])
     print("\n")
-
-    i = i + 1
 
 os.chdir(current_dir)
 utils.update_tsv(tsv_file_path, rows)
