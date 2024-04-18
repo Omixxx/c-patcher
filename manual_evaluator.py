@@ -29,7 +29,7 @@ def prepare_to_manual_evaluation(row: TsvFileInput):
         for line in row.originalMethod.split("\n"):
             file.write(f"{ESCAPE_CHAR}{line}\n")
 
-        file.write(f"{utils.to_camel_case(row.partially_detokenized_method)}")
+        file.write(f"{utils.to_camel_case(row.detokenized_method)}")
 
 
 def get_detokenized_method(file_path: str) -> str:
@@ -49,7 +49,7 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
         if row.is_diff == "False":
             continue
 
-        if row.detokenized_method != "" or row.does_contain_errors == "True":
+        if row.detokenized_method == "" or row.does_contain_errors == "True":
             continue
 
         prepare_to_manual_evaluation(row)
@@ -58,19 +58,18 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
         after_hash = calculate_hash(TEMP_FILE)
 
         if before_hash == after_hash:
-            row.does_contain_errors = bool.__str__(True)
+            # row.does_contain_errors = bool.__str__(True)
             continue
 
-        row.does_contain_errors = bool.__str__(False)
-        row.detokenized_method = get_detokenized_method(TEMP_FILE)
+        # row.does_contain_errors = bool.__str__(False)
+        detokenized_method = get_detokenized_method(TEMP_FILE)
 
         # Exit keyword
-        if row.detokenized_method == "":
-            row.does_contain_errors = ""
+        if detokenized_method == "":
             break
+        row.detokenized_method = detokenized_method
 
     utils.update_tsv(tsv_path, rows)
-    
 
 
 if __name__ == "__main__":
