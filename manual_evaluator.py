@@ -49,6 +49,9 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
         if row.is_diff == "False":
             continue
 
+        if row.does_contain_errors == "":
+            break
+
         if row.detokenized_method == "" or row.does_contain_errors == "True":
             continue
 
