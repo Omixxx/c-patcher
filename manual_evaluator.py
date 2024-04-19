@@ -36,8 +36,6 @@ def get_manual_readability_score(file_path: str) -> str:
     with open(file_path, "r") as file:
         lines = file.readlines()
 
-    print(lines)
-
     return lines[-1].strip().replace("\n", "")
 
 
