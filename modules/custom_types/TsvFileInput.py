@@ -16,6 +16,7 @@ class TsvFileInput:
         predictions_readability_score: str,
         does_test_suite_pass: str,
         does_contain_errors: str,
+        manual_readability_score: str,
     ):
         self.name = name
         self.startLine = startLine
@@ -32,6 +33,7 @@ class TsvFileInput:
         self.predictions_readability_score = predictions_readability_score
         self.does_test_suite_pass = does_test_suite_pass
         self.does_contain_errors = does_contain_errors
+        self.manual_readability_score = manual_readability_score
 
     @staticmethod
     def attributes_as_list_of_strings() -> list[str]:
@@ -51,4 +53,5 @@ class TsvFileInput:
             "predictions_readability_score",
             "does_test_suite_pass",
             "does_contain_errors"
+            "manual_readability_score"
         ]

@@ -28,6 +28,7 @@ def extract_rows(path_to_result_tsv: str) -> list[TsvFileInput]:
                     row["predictions_readability_score"],
                     row["does_test_suite_pass"],
                     row["does_contain_errors"],
+                    row["manual_readability_score"],
                 )
             )
 

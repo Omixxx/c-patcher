@@ -32,6 +32,14 @@ def prepare_to_manual_evaluation(row: TsvFileInput):
         file.write(row.detokenized_method)
 
 
+def get_manual_readability_score(file_path: str) -> int:
+    with open(file_path, "r") as file:
+        lines = file.readlines()
+
+    return int(lines[-1])
+    
+
+
 def get_detokenized_method(file_path: str) -> str:
     with open(file_path, "r") as file:
         lines = file.readlines()
@@ -52,7 +60,7 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
         if row.does_contain_errors == "":
             break
 
-        if row.detokenized_method == "" or row.does_contain_errors == "True":
+        if row.detokenized_method == "" or row.does_contain_errors == "True" or row.manual_readability_score != "":
             continue
 
         prepare_to_manual_evaluation(row)
@@ -65,12 +73,12 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
             continue
 
         # row.does_contain_errors = bool.__str__(False)
-        detokenized_method = get_detokenized_method(TEMP_FILE)
+        manual_readability_score = get_manual_readability_score(TEMP_FILE)
 
         # Exit keyword
-        if detokenized_method == "":
+        if manual_readability_score == -10:
             break
-        row.detokenized_method = detokenized_method
+        row.manual_readability_score = manual_readability_score
 
     utils.update_tsv(tsv_path, rows)
 
