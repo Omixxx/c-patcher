@@ -52,6 +52,6 @@ class TsvFileInput:
             "detokenized_method",
             "predictions_readability_score",
             "does_test_suite_pass",
-            "does_contain_errors"
-            "manual_readability_score"
+            "does_contain_errors",
+            "manual_readability_score",
         ]
