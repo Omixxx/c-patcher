@@ -29,7 +29,7 @@ def prepare_to_manual_evaluation(row: TsvFileInput):
         for line in row.originalMethod.split("\n"):
             file.write(f"{ESCAPE_CHAR}{line}\n")
 
-        file.write(f"{utils.to_camel_case(row.detokenized_method)}")
+        file.write(row.detokenized_method)
 
 
 def get_detokenized_method(file_path: str) -> str:
