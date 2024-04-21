@@ -53,7 +53,11 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
     __create_file(TEMP_FILE)
 
     for row in rows:
-        if row.is_diff == "False" or int(row.manual_readability_score) == 0:
+        if (
+            row.is_diff == "False"
+            or row.manual_readability_score == ""
+            or int(row.manual_readability_score) == 0
+        ):
             continue
 
         if row.does_contain_errors == "":
@@ -77,14 +81,14 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
         # Exit keyword
         if manual_readability_score == "exit":
             break
-        
+
         if manual_readability_score == "error":
             row.does_contain_errors = bool.__str__(True)
             row.predictions_readability_score = ""
             row.does_test_suite_pass = ""
             row.manual_readability_score = ""
             continue
-        
+
         if manual_readability_score == "skip":
             continue
 
