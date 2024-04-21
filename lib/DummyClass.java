@@ -1,8 +1,8 @@
 class DummyClass{
-	 @ Override 
- 	 @ Generated (  "com.github.javaparser.generator.core.node.GetMetaModelGenerator" ) 
- 	 public   ArrayCreationLevelMetaModel   getMetaModel ( ) { 
- 	 return   JavaParserMetaModel. arrayCreationLevelMetaModel ; 
+	 private   void   annotate ( T   node,   Class <? >   annotation,   Expression   content ) { 
+       node. setAnnotations ( node. getAnnotations ( ). stream ( ). filter ( a   - >  ! a. getNameAsString ( ). equals ( annotation. getSimpleName ( ) ) ). collect ( toNodeList ( ) ) ) ; 
+       node. addSingleMemberAnnotation ( annotation. getSimpleName ( ),   a. getMessage ( ) ) ; 
+       node. tryAddImportToParentCompilationUnit ( annotation ) ; 
  	 }
 
 }
