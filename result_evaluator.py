@@ -37,6 +37,7 @@ def __print_results(data, format="grid"):
 def __populate_table(system_name: str, rows: list[TsvFileInput]) -> list[list]:
     rows = [x for x in rows if x.manual_readability_score != ""]
     n_of_methods = len(rows)
+    print(n_of_methods)
     avarage_readability_score_difference = sum(
         [
             Decimal(x.predictions_readability_score) - Decimal(x.readabilityScore)

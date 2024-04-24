@@ -76,23 +76,14 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
             continue
 
         # row.does_contain_errors = bool.__str__(False)
-        manual_readability_score = get_manual_readability_score(TEMP_FILE)
+        detokenized_method = get_detokenized_method(TEMP_FILE)
 
+        
         # Exit keyword
-        if manual_readability_score == "exit":
+        if detokenized_method == "":
             break
-
-        if manual_readability_score == "error":
-            row.does_contain_errors = bool.__str__(True)
-            row.predictions_readability_score = ""
-            row.does_test_suite_pass = ""
-            row.manual_readability_score = ""
-            continue
-
-        if manual_readability_score == "skip":
-            continue
-
-        row.manual_readability_score = manual_readability_score
+        
+        row.detokenized_method = detokenized_method
 
     utils.update_tsv(tsv_path, rows)
 
