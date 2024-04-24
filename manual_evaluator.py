@@ -53,11 +53,7 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
     __create_file(TEMP_FILE)
 
     for row in rows:
-        if (
-            row.is_diff == "False"
-            or row.manual_readability_score == ""
-            or int(row.manual_readability_score) == 0
-        ):
+        if row.is_diff == "False":
             continue
 
         if row.does_contain_errors == "":
@@ -78,11 +74,10 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
         # row.does_contain_errors = bool.__str__(False)
         detokenized_method = get_detokenized_method(TEMP_FILE)
 
-        
         # Exit keyword
         if detokenized_method == "":
             break
-        
+
         row.detokenized_method = detokenized_method
 
     utils.update_tsv(tsv_path, rows)
