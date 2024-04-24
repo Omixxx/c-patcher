@@ -1,6 +1,7 @@
 import os
 import hashlib
 import sys
+import re
 import subprocess
 import modules.utils as utils
 from modules.custom_types.TsvFileInput import TsvFileInput
@@ -29,7 +30,12 @@ def prepare_to_manual_evaluation(row: TsvFileInput):
         for line in row.originalMethod.split("\n"):
             file.write(f"{ESCAPE_CHAR}{line}\n")
 
-        file.write(row.detokenized_method)
+        detokenized_method = re.sub(
+            r"\[ |\( |(?<=)\( | \)| \(| \] | ,| ;|\. | \> |\@ | \< | \+ | - |! | \>|\< |",
+            lambda m: m.group(0).strip(),
+            row.detokenized_method,
+        )
+        file.write(detokenized_method)
 
 
 def get_manual_readability_score(file_path: str) -> str:
@@ -52,7 +58,12 @@ def get_detokenized_method(file_path: str) -> str:
 def evaluate(tsv_path: str, rows: list[TsvFileInput]):
     __create_file(TEMP_FILE)
 
+    i = 0
     for row in rows:
+        if i > 100:
+            break
+        i += 1
+        
         if row.is_diff == "False":
             continue
 
@@ -77,6 +88,8 @@ def evaluate(tsv_path: str, rows: list[TsvFileInput]):
         # Exit keyword
         if detokenized_method == "":
             break
+        if detokenized_method == "skip":
+            continue
 
         row.detokenized_method = detokenized_method
 
