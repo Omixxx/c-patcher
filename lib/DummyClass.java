@@ -1,8 +1,8 @@
 class DummyClass{
-	 private   void   annotate ( T   node,   Class <? >   annotation,   Expression   content ) { 
-       node. setAnnotations ( node. getAnnotations ( ). stream ( ). filter ( a   - >  ! a. getNameAsString ( ). equals ( annotation. getSimpleName ( ) ) ). collect ( toNodeList ( ) ) ) ; 
-       node. addSingleMemberAnnotation ( annotation. getSimpleName ( ),   a. getMessage ( ) ) ; 
-       node. tryAddImportToParentCompilationUnit ( annotation ) ; 
+	 public   static   hashBasedTable < r,   c,   v >   create ( inT   expectedRows,   inT   expectedCellsPerRow ) { 
+       checkNonNegative ( expectedCellsPerRow,   $string$ ) ; 
+       map < r,   map < c,   v >>   backingMap   =   maps. newLinkedHashMapWithExpectedSize ( expectedRows ) ; 
+       return   new   hashBasedTable < > ( backingMap,   new   factory < c,   v > ( expectedCellsPerRow ) ) ; 
  	 }
 
 }
