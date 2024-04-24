@@ -12,4 +12,4 @@ row = rows[int(line_number) - 1]
 with open(f"{row.name}.java", "w") as f:
     f.write(row.originalMethod)
     f.write("\n")
-    f.write(row.detokenized_method)
+    f.write(row.partially_detokenized_method)
